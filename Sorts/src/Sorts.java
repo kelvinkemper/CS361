@@ -1,30 +1,57 @@
+import java.util.Arrays;
 import java.util.Random;
 
+/**
+ * Kelvin Kemper
+ * CS 361
+ */
 
 public class Sorts {
 
-    public void merge(int arr[], int p, int q, int r) {
+    static final int n = 100000; // number of elements to be sorted
+    static final int threshold = 44;    // use insertion sort if size <= S
 
-        // Create L ← A[p..q] and M ← A[q+1..r]
-        int n1 = q - p + 1;
-        int n2 = r - q;
+    /**
+     * Method is the first part of mergesort where the array is divided recursively into smaller parts
+     * before being placed back together in a new array.
+     */
+    public void mergeSort(int arr[], int left, int right) {
+        if (left < right) {
 
-        int L[] = new int[n1];
-        int M[] = new int[n2];
+            int mid = (left + right) / 2;
+
+            mergeSort(arr, left, mid);
+            mergeSort(arr, mid + 1, right);
+
+            // Merge the sorted subarrays
+            merge(arr, left, mid, right);
+        }
+    }
+
+    /**
+     * Second part of merge sort where we combine elemetns of the unsorted array into a sorted state.
+     * @param arr input array of random elements
+     *
+     */
+    public void merge(int arr[], int l, int m, int r) {
+        int n1 = m - l + 1;
+        int n2 = r - m;
+        int L[] = Arrays.copyOfRange(arr, l, m + 1);
+        int M[] = Arrays.copyOfRange(arr, m + 1, r + 1);
 
         for (int i = 0; i < n1; i++)
-            L[i] = arr[p + i];
+            L[i] = arr[l + i];
         for (int j = 0; j < n2; j++)
-            M[j] = arr[q + 1 + j];
+            M[j] = arr[m + 1 + j];
 
         // Maintain current index of sub-arrays and main array
         int i, j, k;
         i = 0;
         j = 0;
-        k = p;
+        k = l;
 
         // Until we reach either end of either L or M, pick larger among
-        // elements L and M and place them in the correct position at A[p..r]
+        // elements L and M and place them in the correct position
         while (i < n1 && j < n2) {
             if (L[i] <= M[j]) {
                 arr[k] = L[i];
@@ -51,83 +78,118 @@ public class Sorts {
         }
     }
 
-    // Divide the array into two subarrays, sort them and merge them
-    public void mergeSort(int arr[], int l, int r) {
-        if (l < r) {
+    /**
+     * Insertion Sort method
+     * Compare key with each element on the left of it until an element smaller than
+     * it is found.
+     * @param array random array generated in main method
+     */
+    public void insertionSort(int array[], int left, int right) {
+        //iterate through array while checking if j >=0 and current array[i] is less than array[i-1]
+        for (int i= 1; i < array.length; i++) {
+            int curr = array[i];
+            int j = i - 1;
 
-            // m is the point where the array is divided into two subarrays
-            int m = (l + r) / 2;
-
-            mergeSort(arr, l, m);
-            mergeSort(arr, m + 1, r);
-
-            // Merge the sorted subarrays
-            merge(arr, l, m, r);
-        }
-    }
-
-    public void insertionSort(int array[]) {
-        int size = array.length;
-
-        for (int step = 1; step < size; step++) {
-            int key = array[step];
-            int j = step - 1;
-
-            // Compare key with each element on the left of it until an element smaller than
-            // it is found.
-            // For descending order, change key<array[j] to key>array[j].
-            while (j >= 0 && key < array[j]) {
+            while (j >= 0 && curr < array[j]) {
                 array[j + 1] = array[j];
-                --j;
+                j--;
             }
 
-            // Place key at after the element just smaller than it.
-            array[j + 1] = key;
+            array[j + 1] = curr;
         }
     }
 
-    // Print the array
+    /**
+     * Prints the sorted array
+     * no longer needed, only need for verification that the algorithm actually returns sorted array
+     */
     public static void printArray(int arr[]) {
-        int n = arr.length;
-        for (int i = 0; i < n; ++i)
-            System.out.print(arr[i] + " ");
-        System.out.println();
+        java.util.Arrays.toString(arr);
     }
 
-    // Driver program
+
+    /**
+     * combining Merge Sort and Insertion Sort by using code from each
+     * @param arr input random element array of size n
+     * @param l starting
+     * @param r end
+     * @param threshold
+     */
+
+    public void mergeInsertionSort(int[] arr, int l, int r, int threshold) {
+        if (r - l <= threshold) {
+            insertionSort(arr, l, r);
+        } else {
+            int mid = (l+r)/2;
+            mergeSort(arr,l,mid);
+            mergeSort(arr,mid,r);
+            merge(arr,l,mid,r);
+        }
+    }
+
+    /**
+     * Tests if the array is actually sorted and throws a print statement if false
+     * @param arr input array of current sorting algorithm
+     */
+    public static void testSort(int arr[]) {
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i-1] > arr[i]) {
+                System.out.println("Sort failed");
+                break;
+            }
+        }
+    }
 
     public static void main(String[] args) {
 
         //Amount of elements in the array.
-        int n = 100;
 
         Random rd = new Random(); // creating Random object
-        int[] arr = new int[n];
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = rd.nextInt(); // storing random integers in an array
-        }
+
         Sorts mergeSort = new Sorts();
         Sorts insertSort = new Sorts();
+        Sorts mergeInsertionSort = new Sorts();
 
-        System.out.println("MergeSort");
-        double startTime = System.currentTimeMillis();
-        mergeSort.mergeSort(arr, 0, arr.length - 1);
-        double elapsedTime = System.currentTimeMillis() - startTime;
-        System.out.println("It took " + elapsedTime + " milliseconds to complete a merge " +
-                 "sort of " + arr.length + " elements");
 
+        int[] arr1 = new int[n];
         int[] arr2 = new int[n];
-        for (int i = 0; i < arr2.length; i++) {
-            arr2[i] = rd.nextInt(); // storing random integers in an array
+        int[] arr3 = new int[n];
+        for (int i = 0; i < arr1.length; i++) {
+            // storing random integers in an array
+            // same elements being sorted in different arrays to have consistency
+            arr1[i] = rd.nextInt();
+            arr2[i] = arr1[i];
+            arr3[i] = arr1[i];
         }
+
+        System.out.println("Insertion Sort");
+        double startTime1 = System.currentTimeMillis();
+        insertSort.insertionSort(arr1, 0, arr3.length);
+        double elapsedTime1 = System.currentTimeMillis() - startTime1;
+        testSort(arr1);
+        System.out.println("It took " + elapsedTime1/1000 + " seconds to complete an insertion"
+                + " sort of " + arr1.length + " elements\n");
+
+
+        System.out.println("Merge Sort");
         double startTime2 = System.currentTimeMillis();
-        insertSort.insertionSort(arr2);
+        mergeSort.mergeSort(arr2, 0, arr2.length - 1);
         double elapsedTime2 = System.currentTimeMillis() - startTime2;
-        System.out.println("It took " + elapsedTime2 + " milliseconds to complete an insertion"
-                + " sort of " + arr2.length + " elements");
+        printArray(arr2);
+        testSort(arr2);
+        System.out.println("It took " + elapsedTime2/1000 + " seconds to complete a merge " +
+                "sort of " + arr2.length + " elements\n");
         //printArray(arr2);
+
+
+        System.out.println("Merge-Insertion Sort");
+        mergeInsertionSort.mergeInsertionSort(arr3, 0, arr3.length-1, threshold);
+        double startTime3 = System.currentTimeMillis();
+        mergeSort.mergeSort(arr3, 0, arr3.length - 1);
+        double elapsedTime3 = System.currentTimeMillis() - startTime3;
+        testSort(arr3);
+        System.out.println("It took " + elapsedTime3/1000 + " seconds to complete a merge-insertion" +
+                "sort of " + arr3.length + " elements");
+        testSort(arr3);
     }
-
-
-
 }
