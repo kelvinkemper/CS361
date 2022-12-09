@@ -11,7 +11,8 @@ import java.util.stream.IntStream;
 
 public class darySort {
 
-    static final int n =100; // number of elements to be sorted
+    static final int n = 10;// number of elements to be sorted
+    static final int d = 5;
     public void sort(int arr[])
     {
         int N = arr.length;
@@ -35,6 +36,7 @@ public class darySort {
     // To heapify a subtree rooted with node i which is
     // an index in arr[]. n is size of heap
     public void heapify(int arr[], int N, int i) {
+        printArray(arr);
         int largest = i; // Initialize largest as root
         int l = 2 * i + 1; // left = 2*i + 1
         int r = 2 * i + 2; // right = 2*i + 2
